@@ -9,9 +9,13 @@ async function bootstrap() {
     AppModule,
     {
       transport: Transport.TCP,
+      options: {
+        host: process.env.HOST,
+        port: Number(process.env.PORT),
+      },
     },
   );
   await app.listen();
-  logger.log('App has started');
+  logger.log(`App has started on ${process.env.HOST}:${process.env.PORT}`);
 }
 bootstrap();

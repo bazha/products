@@ -1,21 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
-import {
-  ClientProxy,
-  ClientProxyFactory,
-  Transport,
-} from '@nestjs/microservices';
+import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 
-@Controller('products')
+@Controller()
 export class ProductsController {
-  private client: ClientProxy;
-
-  constructor() {
-    this.client = ClientProxyFactory.create({
-      transport: Transport.TCP,
-    });
-  }
-  @Get('/')
-  async findAll() {
-    return await this.client.send<any>('/', 'returm all products');
+  @MessagePattern({ cmd: 'hello' })
+  hello(input?: string): string {
+    return `Hello, ${input || 'there'}!`;
   }
 }

@@ -4,14 +4,14 @@ services:
     command: npm run start:dev
     restart: unless-stopped
     ports: 
-      - "3000:3000"
+      - "3001:3001"
     environment:
       - DB_USERNAME=postgres
       - DB_PASSWORD=password
       - DB_NAME=TestService
       - DB_HOST=0.0.0.0
       - DB_PORT=5432
-      - API_PORT=3000
+      - API_PORT=8080
     depends_on:
       - postgres  
   postgres:
