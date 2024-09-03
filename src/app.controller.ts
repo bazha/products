@@ -1,12 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Inject, Get, Param } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(@Inject('PRODCUTS_SERVICE') private client: ClientProxy) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHelloByName(@Param('name') name = 'there') {
+    return this.client.send({ cmd: 'hello' }, name);
   }
 }
