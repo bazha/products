@@ -5,17 +5,22 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');
+
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.RMQ,
       options: {
-        host: process.env.HOST,
-        port: Number(process.env.PORT),
+        urls: ['amqp://localhost:5672'],
+        queue: 'products_queue',
+        queueOptions: {
+          durable: false,
+        },
       },
     },
   );
+
   await app.listen();
-  logger.log(`App has started on ${process.env.HOST}:${process.env.PORT}`);
+  logger.log('App has started');
 }
 bootstrap();
