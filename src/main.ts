@@ -21,6 +21,6 @@ async function bootstrap() {
   );
 
   await app.listen();
-  logger.log('Products app has started');
+  logger.log('App has started');
 }
 bootstrap();
