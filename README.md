@@ -1,73 +1,88 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Products Microservice
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS microservice for product management with gRPC and RabbitMQ support, backed by PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Technology Stack
 
-## Description
+- **Framework**: NestJS 10.x with TypeScript 5.x
+- **Database**: PostgreSQL with TypeORM 0.3.x
+- **Communication**: gRPC (port 3002) & RabbitMQ
+- **Runtime**: Node.js 20.x
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Installation
+- Product CRUD operations (id, name, description, price)
+- gRPC service `ProductsService` with `GetProducts` RPC
+- RabbitMQ message pattern `getProducts` on queue `products_queue`
+- Environment-based configuration with validation
+- Graceful shutdown and Docker support
+
+## Prerequisites
+
+Node.js 20.x, PostgreSQL 12.x, RabbitMQ 3.x
+
+## Installation & Configuration
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Running the app
+Create `.env` file with required variables:
+
+```env
+# Database (required)
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=products_db
+
+# RabbitMQ (optional)
+RABBITMQ_URL=amqp://localhost:5672
+RABBITMQ_QUEUE=products_queue
+
+# gRPC (optional)
+GRPC_PACKAGE=products
+GRPC_URL=0.0.0.0:3002
+NODE_ENV=development
+```
+
+## Running
 
 ```bash
-# development
-$ npm run start
+npm run start:dev    # Development with watch mode
+npm run build        # Build for production
+npm run start:prod   # Run production build
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Docker
+docker build -t products-microservice .
+docker run -p 3002:3002 --env-file .env products-microservice
 ```
 
-## Test
+## Testing
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm test              # Unit tests
+npm run test:e2e      # E2E tests
+npm run test:cov      # Coverage
 ```
 
-## Support
+## API
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### gRPC - GetProducts
+```protobuf
+service ProductsService {
+  rpc GetProducts (GetProductsRequest) returns (GetProductsResponse);
+}
 
-## Stay in touch
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+}
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+### RabbitMQ
+- **Pattern**: `getProducts`
+- **Payload**: string (filter)
